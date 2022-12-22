@@ -20,6 +20,18 @@ class FileTreeNode:
                 child_node.print_tree()
         else:
             print(f"Folder: {self.name}, Size: {self.size}")
+            
+    def find_node_closest_to_size(self, size: int, least_sized_node = None):
+        if self.size > size:
+            if least_sized_node:
+                if self.size < least_sized_node.size:
+                    return self
+            else:
+                least_sized_node = self
+        if self.has_subfolders():
+            for child in self.subfolders:
+                least_sized_node = child.find_node_closest_to_size(size, least_sized_node)
+        return least_sized_node
     
     def compute_tree_folder_sizes(self):
         total_size = 0
@@ -95,8 +107,15 @@ def read_file_into_tree():
 def part1():
     root_node = read_file_into_tree()
     root_node.compute_tree_folder_sizes()
-    # root_node.print_tree()
     return root_node.total_of_folders_under_100k()
-    
+
+def part2():
+    root_node = read_file_into_tree()
+    root_node.compute_tree_folder_sizes()
+    space_needed_to_free = root_node.size - 70000000 + 30000000
+    folder_to_remove = root_node.find_node_closest_to_size(space_needed_to_free)
+    return(folder_to_remove)
+
 if __name__ == "__main__":
     print(part1())
+    print(part2())
